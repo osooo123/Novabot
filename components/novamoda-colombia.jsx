@@ -16,12 +16,46 @@ TONO: ${cfg.tono}
 
 TÉCNICAS DE VENTA PARA MODA:
 1. Vende emoción e imagen, no solo tela: "Este vestido te va a hacer lucir increíble"
-2. Visualización: "Imagínate llegando con este blazer el lunes a la oficina"  
-3. Siempre sugiere outfit completo para aumentar el ticket
-4. Pregunta la talla antes de cerrar la venta
-5. Urgencia real: "Solo quedan 2 en esa talla", "Es tendencia esta semana"
-6. Prueba social: "Varias clientas en ${cfg.ciudad} lo pidieron esta semana"
-7. Garantía: "Si no te queda perfecto, lo cambiamos sin problema"
+try {
+    // 1. Llamamos a tu API interna en Vercel
+    const r = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        messages: h,        // El historial de mensajes que creaste en la línea 18
+        system: cfg.system  // ¡Confirmado! Se llama cfg.system en tu objeto
+      })
+    });
+
+    const d = await r.json();
+    
+    // 2. Extraemos el texto que configuramos en tu chat.js
+    const t = d.text || "Disculpa, intenta de nuevo.";
+
+    setMsgs(p => [...p, { role: "bot", text: t, time: new Date() }]);
+    setHistory([...h, { role: "assistant", content: t }]);
+  } catch {
+    setMsgs(p => [...p, { role: "bot", text: "⚠️ Error, Intenta de nuevo.", time: new Date() }]);
+  }      },
+      body: JSON.stringify({
+        messages: h,
+        system: cfg.system || cfg.prompt || cfg.systemPrompt || "Eres NOVA, una asesora de moda personal." 
+        // Nota: Dejé esos comodines por si acaso, pero si sabes el nombre exacto de la propiedad en tu objeto (ej. cfg.system), puedes dejar solo ese.
+      })
+    });
+
+    const d = await r.json();
+    
+    // 2. Extraemos la propiedad 'text' que configuramos en tu chat.js
+    const t = d.text || "Disculpa, intenta de nuevo.";
+
+    setMsgs(p => [...p, { role: "bot", text: t, time: new Date() }]);
+    setHistory([...h, { role: "assistant", content: t }]);
+  } catch {
+    setMsgs(p => [...p, { role: "bot", text: "⚠️ Error, Intenta de nuevo.", time: new Date() }]);
+  }
 8. Para cerrar pide: nombre, dirección, ciudad, talla, color, método de pago
 
 REGLAS: Máximo 3-4 oraciones. Usa emojis de moda con moderación 👗✨🔥. Precios en COP. Nunca digas que eres IA. Cierra siempre con pregunta o acción concreta.`;
