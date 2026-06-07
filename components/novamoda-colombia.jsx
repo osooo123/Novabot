@@ -2,26 +2,33 @@ import { useState, useRef, useEffect } from "react";
 
 const COP = n => n === 0 ? "GRATIS" : `$${new Intl.NumberFormat("es-CO").format(n)}`;
 
-export const MODA_PROMPT = (cfg) => `Eres NOVA, la mejor asesora de ventas de moda en Colombia para "${cfg.name}" en ${cfg.ciudad}.
+export const MODA_PROMPT = (cfg) => {
+  if (!cfg) return "Eres NOVA, una asesora de modas.";
+  return `Eres NOVA, la mejor asesora de ventas de moda en Colombia para "${cfg.name || 'la tienda'}" en ${cfg.ciudad || 'Colombia'}.
 
 TIPO DE TIENDA: ${cfg.tipo === "femenina" ? "Moda femenina, boutique, tendencias mujer" : "Ropa urbana, streetwear, moda joven"}
 
 CATÁLOGO:
-${cfg.productos.map(p => `- 👗 ${p.n} 💰 ${COP(p.p)} COP | Tallas: ${p.tallas || "Consultar"} | Colores: ${p.colores || "Varios"}`).join("\n")}
+${(cfg.productos || []).map(p => `- 👗 ${p.n} 💰 ${COP(p.p)} COP | Tallas: ${p.tallas || "Consultar"} | Colores: ${p.colores || "Varios"}`).join("\n")}
 
-PROMOCIÓN: ${cfg.promo}
-PAGOS: ${cfg.pagos}
-ENVÍOS: ${cfg.envios}
-TONO: ${cfg.tono}
+PROMOCIÓN: ${cfg.promo || 'No aplica'}
+PAGOS: ${cfg.pagos || 'A convenir'}
+ENVÍOS: ${cfg.envios || 'A acordar'}
+TONO: ${cfg.tono || 'Amigable'}
 
 TÉCNICAS DE VENTA PARA MODA:
 1. Vende emoción e imagen, no solo tela: "Este vestido te va a hacer lucir increíble"`;
+};
 
-export default function NovaModaColombia({ cfg }) {
+export default function NovaModaColombia({ cfg = {} }) {
+  // Valores por defecto seguros para evitar el error 'undefined' durante el build
+  const tiendaName = cfg?.name || "Nuestra Tienda";
+  const tiendaCiudad = cfg?.ciudad || "Colombia";
+
   const [msgs, setMsgs] = useState([
     {
       role: "bot",
-      text: `¡Hola! 👗✨ Bienvenida a ${cfg.name}. Soy NOVA, tu asesora de moda personal. ¿Qué tipo de prenda estás buscando hoy? 🛍️`,
+      text: `¡Hola! 👗✨ Bienvenida a ${tiendaName}. Soy NOVA, tu asesora de moda personal. ¿Qué tipo de prenda estás buscando hoy? 🛍️`,
       time: new Date()
     }
   ]);
@@ -48,7 +55,6 @@ export default function NovaModaColombia({ cfg }) {
     const h = [...history, { role: "user", content: userText }];
 
     try {
-      // 1. Llamamos a tu API interna segura en Vercel
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -56,13 +62,11 @@ export default function NovaModaColombia({ cfg }) {
         },
         body: JSON.stringify({
           messages: h,
-          system: cfg.system
+          system: cfg?.system || ""
         })
       });
 
       const d = await r.json();
-      
-      // 2. Extraemos el texto configurado en tu chat.js
       const t = d.text || "Disculpa, intenta de nuevo.";
 
       setMsgs(p => [...p, { role: "bot", text: t, time: new Date() }]);
@@ -83,10 +87,10 @@ export default function NovaModaColombia({ cfg }) {
             <span className="text-xl">🛍️</span>
           </div>
           <div>
-            <h1 className="font-bold text-base tracking-wide">{cfg.name}</h1>
+            <h1 className="font-bold text-base tracking-wide">{tiendaName}</h1>
             <p className="text-xs text-pink-200 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-              NOVA activa • {cfg.ciudad}
+              NOVA activa • {tiendaCiudad}
             </p>
           </div>
         </div>
