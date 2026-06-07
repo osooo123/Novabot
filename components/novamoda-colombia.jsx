@@ -77,7 +77,9 @@ function ModaChat({ tiendaKey, onClose }) {
     setLoading(true);
     const h = [...history, { role: "user", content: txt }];
     try {
-      const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "anthropic-dangerous-direct-browser-access": "true" }, body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: MODA_PROMPT(cfg), messages: h }) });
+      const r = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, system: MODA_PROMPT(cfg), messages: h }) });
       const d = await r.json();
       const t = d.content?.[0]?.text || "Disculpa, intenta de nuevo.";
       setMsgs(p => [...p, { role: "bot", text: t, time: new Date() }]);

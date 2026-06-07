@@ -186,11 +186,11 @@ function NovaChat({ tiendaKey, onClose }) {
     setLoading(true);
     const h = [...history, { role: "user", content: txt }];
     try {
-      const r = await fetch("https://api.anthropic.com/v1/messages", {
+      const r = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "anthropic-dangerous-direct-browser-access": "true"
+          
         },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
