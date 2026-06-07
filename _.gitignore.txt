@@ -1,0 +1,13 @@
+# Archivos que NUNCA se suben a GitHub
+.env.local
+.env
+.env*.local
+
+# Carpetas del sistema
+node_modules/
+.next/
+out/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
