@@ -62,9 +62,9 @@ export default async function handler(req, res) {
       messagesForAPI.push({ role: 'user', content: 'Hola' });
     }
 
-    // LLAMADA CORREGIDA: Se actualiza el string del modelo a la versión oficial y estable
+    // LLAMADA CORREGIDA: Se usa Claude 3 Haiku para total compatibilidad con créditos gratis de regalo
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-latest", 
+      model: "claude-3-haiku-20240307", 
       max_tokens: 1000,
       temperature: 0.5,
       system: systemPrompt,
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Error en backend chat.js:", error);
-    // Respuesta segura anti-caídas corta para que la interfaz mantenga el flujo limpio si algo falla
+    // Respuesta segura anti-caídas corta para mantener el flujo limpio
     return res.status(200).json({ 
       text: "Disculpa, tuve un pequeño problema al procesar el mensaje. ¿Podrías intentar enviarlo de nuevo? ✨" 
     });
