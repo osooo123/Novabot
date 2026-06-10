@@ -62,9 +62,9 @@ export default async function handler(req, res) {
       messagesForAPI.push({ role: 'user', content: 'Hola' });
     }
 
-    // LLAMADA CORREGIDA: Se usa Claude 3 Haiku para total compatibilidad con créditos gratis de regalo
+    // LLAMADA CORREGIDA: Se usa claude-2.1 para saltar la restricción del tier gratuito
     const response = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307", 
+      model: "claude-2.1", 
       max_tokens: 1000,
       temperature: 0.5,
       system: systemPrompt,
