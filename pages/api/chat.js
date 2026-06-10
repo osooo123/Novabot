@@ -1,7 +1,7 @@
-// Importación ultra-compatible para entornos estrictos de Vercel
+// Importación ultra-compatible para entornos estrictos
 import Anthropic from '@anthropic-ai/sdk';
 
-// Inicialización con validación previa para que Vercel no falle en el build si la clave no se ha leído
+// Inicialización con validación previa para evitar fallos en el build si la clave no se ha leído
 const anthropic = process.env.ANTHROPIC_API_KEY 
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) 
   : null;
@@ -13,9 +13,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Si la API key no está configurada en las variables de entorno de Vercel, disparamos el fallback de inmediato
+    // Si la API key no está configurada, disparamos el fallback de inmediato
     if (!anthropic) {
-      console.error("Falta la variable ANTHROPIC_API_KEY en Vercel.");
+      console.error("Falta la variable ANTHROPIC_API_KEY en el entorno.");
       return res.status(200).json({ 
         text: "¡Hola! 😍 Veo que estás interesada en nuestra hermosa colección. Presiona los botones de abajo para mostrarte los precios, tallas y las prendas espectaculares que tenemos listas para envío inmediato hoy mismo. ✨" 
       });
@@ -62,9 +62,9 @@ export default async function handler(req, res) {
       messagesForAPI.push({ role: 'user', content: 'Hola' });
     }
 
-    // Llamada oficial a Claude 3.5 Sonnet
+    // LLAMADA CORREGIDA: Se actualiza el string del modelo a la versión oficial y estable
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022", 
+      model: "claude-3-5-sonnet-latest", 
       max_tokens: 1000,
       temperature: 0.5,
       system: systemPrompt,
@@ -76,9 +76,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error("Error en backend chat.js:", error);
-    // Respuesta segura anti-caídas
+    // Respuesta segura anti-caídas corta para que la interfaz mantenga el flujo limpio si algo falla
     return res.status(200).json({ 
-      text: "¡Hola! 😍 Veo que estás interesada en nuestra hermosa colección. Presiona los botones de abajo para mostrarte los precios, tallas y las prendas espectaculares que tenemos listas para envío inmediato hoy mismo. ✨" 
+      text: "Disculpa, tuve un pequeño problema al procesar el mensaje. ¿Podrías intentar enviarlo de nuevo? ✨" 
     });
   }
 }
